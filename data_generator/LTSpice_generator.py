@@ -17,7 +17,7 @@ class schematicAscGenerator:
     def coordsSetter(self, x, y):
         newX = x if x%16 == 0 else round(x/16)*16
         newY = y if y%16 == 0 else round(y/16)*16
-        return newX, newY
+        return newX, newY*-1
     
 
     def wire(self, x0, y0, x1, y1):
@@ -30,8 +30,12 @@ class schematicAscGenerator:
         x0, y0 = self.coordsSetter(x0, y0)
         x1, y1 = self.coordsSetter(x1, y1)
 
-        name = f'W{len(self.wires)}'
-        self.wires[name] = f'WIRE {x0} {y0} {x1} {y1}'
+        if (x0 == x1) or (y0 == y1): ### Cable recto
+            name = f'W{len(self.wires)}'
+            self.wires[name] = f'WIRE {x0} {y0} {x1} {y1}'
+        else:
+            name = f'W{len(self.wires)}'
+            self.wires[name] = f'WIRE {x0} {y0} {x1} {y0}\nWIRE {x1} {y0} {x1} {y1}'
     
     def ground(self, x, y):
         # x = initial position in x
