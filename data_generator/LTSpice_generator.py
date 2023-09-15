@@ -1,4 +1,5 @@
 import re
+import numpy as np
 
 class schematicAscGenerator:
     def __init__(self):
@@ -10,14 +11,35 @@ class schematicAscGenerator:
         self.d = {}
         self.v = {}
         self.comp = {}
+        self.coords = []
 
         # File header
         self.asc = "Version 4\nSHEET 1 880 680\n"
         
-    def coordsSetter(self, x, y):
+    def coordsSetter(self, x, y, comp="wire", deg = 0):
         newX = x if x%16 == 0 else round(x/16)*16
         newY = y if y%16 == 0 else round(y/16)*16
-        return newX, newY*-1
+        newY = -1*newY
+
+        if comp == "res" or comp == "ind":
+            newX = newX-16*np.sign(np.cos(np.deg2rad(deg+1)))
+            newY = newY-16*np.sign(np.sin(np.deg2rad(deg+1)))
+        if comp == "diode":
+            newX = newX-16*round(np.cos(np.deg2rad(deg)))
+        if comp == "cap":
+            newX = newX-16*round(np.cos(np.deg2rad(deg)))
+            newY = newY-16*round(np.sin(np.deg2rad(deg)))
+        if comp == "volt":
+            newX = newX+16*round(np.sin(np.deg2rad(deg)))
+            newY = newY-16*round(np.cos(np.deg2rad(deg)))
+        if comp == "curr":
+            newX = newX
+            newY = newY
+
+        
+        return int(newX), int(newY)
+    
+
     
 
     def wire(self, x0, y0, x1, y1):
@@ -49,7 +71,7 @@ class schematicAscGenerator:
         # y = initial position in y
         # deg = rotation (0, 90, 270)
         # val = resistance value
-        x, y = self.coordsSetter(x, y)
+        x, y = self.coordsSetter(x, y, "res", deg)
         # Name of resistance is equal to the number of components 
         name = f'R{len(self.r)}'
         # Coords and rotation
@@ -66,6 +88,14 @@ class schematicAscGenerator:
             "nameTag":nameTag,
             "valueTag":valueTag
         }
+
+        self.coords.append({
+            "start_x": x, 
+            "start_y": y, 
+            "end_x": x+round(np.sin(np.deg2rad(deg)))*16*5, 
+            "end_y": y-round(np.cos(np.deg2rad(deg)))*16*5, 
+        })
+
         # Change window size depends of rotation
         if deg == 90 or deg==270:
             window  = "WINDOW 0 0 56 VBottom 2\nWINDOW 3 32 56 VTop 2" if deg == 90 else "WINDOW 0 32 56 VBottom 2\nWINDOW 3 0 56 VTop 2"
@@ -76,7 +106,7 @@ class schematicAscGenerator:
         # y = initial position in y
         # deg = rotation (0, 90, 270)
         # val = capacitor value
-        x, y = self.coordsSetter(x, y)
+        x, y = self.coordsSetter(x, y, "cap", deg)
         # Name of capacitor is equal to the number of components 
         name = f'C{len(self.c)}'
         # Coords and rotation
@@ -108,7 +138,7 @@ class schematicAscGenerator:
         # y = initial position in y
         # deg = rotation (0, 90, 270)
         # val = capacitor value
-        x, y = self.coordsSetter(x, y)
+        x, y = self.coordsSetter(x, y, "ind", deg)
         # Name of capacitor is equal to the number of components 
         name = f'L{len(self.l)}'
         # Coords and rotation
@@ -141,7 +171,7 @@ class schematicAscGenerator:
         # y = initial position in y
         # deg = rotation (0, 90, 270)
         # val = capacitor value
-        x, y = self.coordsSetter(x, y)
+        x, y = self.coordsSetter(x, y, "diode", deg)
         # Name of capacitor is equal to the number of components 
         name = f'D{len(self.d)}'
         # Coords and rotation
@@ -171,7 +201,7 @@ class schematicAscGenerator:
         # y = initial position in y
         # deg = rotation (0, 90, 270)
         # val = capacitor value
-        x, y = self.coordsSetter(x, y)
+        x, y = self.coordsSetter(x, y, "volt", deg)
         # Name of capacitor is equal to the number of components 
         name = f'V{len(self.v)}'
         # Coords and rotation
@@ -276,6 +306,8 @@ class schematicAscGenerator:
         return self.v
     def getComp(self):
         return self.comp
+    def getCoords(self):
+        return self.coords
     
     
     def compile(self, file_name = "output.asc"):
