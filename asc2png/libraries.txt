@@ -1,0 +1,6 @@
+TeX Live
+https://tug.org/texlive/acquire.html
+
+
+PDF2jpg
+pip install pdf2image
