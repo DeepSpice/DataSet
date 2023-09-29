@@ -2,18 +2,28 @@ from LTSpice_generator import schematicAscGenerator
 
 G = schematicAscGenerator()
 
+G.ground(0, -80)
+G.voltage(0, 0, 0, 5)
+G.wire(0, 0, 50, 0)
+G.res(50, 0, 270, 12)
+G.wire(130, 0, 180, -50)
+G.ground(180, -50)
+
+G.compile()
+
+
 #G.wire(0, 0, 100, 100)
-G.res(0, 0, 0, 10)
-G.res(0, 0, 90, 20)
-G.res(0, 0, 180, 30)
-G.res(0, 0, 270, 40)
+# G.res(0, 0, 0, 10)
+# G.res(0, 0, 90, 20)
+# G.res(0, 0, 180, 30)
+# G.res(0, 0, 270, 40)
 
 
-for coords in G.getCoords():
-    print(coords["start_x"], coords["start_y"] ,coords["end_x"], coords["end_y"])
-    G.wire(coords["start_x"], coords["start_y"] ,coords["end_x"], coords["end_y"])
+# for coords in G.getCoords():
+#     print(coords["start_x"], coords["start_y"] ,coords["end_x"], coords["end_y"])
+#     G.wire(coords["start_x"], coords["start_y"] ,coords["end_x"], coords["end_y"])
 
-print(G.getCoords())
+# print(G.getCoords())
 
 # Resistencia e ind
 # 0 - +
@@ -72,4 +82,3 @@ print(G.getCoords())
 # G.diode(0, 0, 0)
 # G.diode(0, 16*4, 0)
 
-G.compile()

@@ -15,6 +15,17 @@ class schematicAscGenerator:
 
         # File header
         self.asc = "Version 4\nSHEET 1 880 680\n"
+    
+    def reset(self):
+        self.wires = {}
+        self.g = {}
+        self.r = {}
+        self.c = {}
+        self.l = {}
+        self.d = {}
+        self.v = {}
+        self.comp = {}
+        self.coords = []
         
     def coordsSetter(self, x, y, comp="wire", deg = 0):
         newX = x if x%16 == 0 else round(x/16)*16
@@ -36,12 +47,8 @@ class schematicAscGenerator:
             newX = newX
             newY = newY
 
-        
         return int(newX), int(newY)
     
-
-    
-
     def wire(self, x0, y0, x1, y1):
         #'''
         # x0 = initial position in x
@@ -132,6 +139,13 @@ class schematicAscGenerator:
             elif deg == 270:
                 window  = "WINDOW 0 32 32 VTop 2\nWINDOW 3 0 32 VBottom 2"
             self.c[name]["window"] = window
+        
+        self.coords.append({
+            "start_x": x, 
+            "start_y": y, 
+            "end_x": x+round(np.sin(np.deg2rad(deg)))*16*5, 
+            "end_y": y-round(np.cos(np.deg2rad(deg)))*16*5, 
+        })
             
     def ind(self, x, y, deg, val):
         # x = initial position in x
@@ -164,8 +178,13 @@ class schematicAscGenerator:
             elif deg == 270:
                 window  = "WINDOW 0 32 56 VTop 2\nWINDOW 3 5 56 VBottom 2"
             self.l[name]["window"] = window
-            
-            
+        self.coords.append({
+            "start_x": x, 
+            "start_y": y, 
+            "end_x": x+round(np.sin(np.deg2rad(deg)))*16*5, 
+            "end_y": y-round(np.cos(np.deg2rad(deg)))*16*5, 
+        })
+                       
     def diode(self, x, y, deg):
         # x = initial position in x
         # y = initial position in y
@@ -194,8 +213,13 @@ class schematicAscGenerator:
             elif deg == 270:
                 window  = "WINDOW 0 32 32 VTop 2\nWINDOW 3 0 32 VBottom 2"
             self.d[name]["window"] = window
-            
-            
+        self.coords.append({
+            "start_x": x, 
+            "start_y": y, 
+            "end_x": x+round(np.sin(np.deg2rad(deg)))*16*5, 
+            "end_y": y-round(np.cos(np.deg2rad(deg)))*16*5, 
+        })
+                     
     def voltage(self, x, y, deg, val):
         # x = initial position in x
         # y = initial position in y
@@ -229,7 +253,12 @@ class schematicAscGenerator:
             "valueTag":valueTag,
             "window":window
         }
-
+        self.coords.append({
+            "start_x": x, 
+            "start_y": y, 
+            "end_x": x+round(np.sin(np.deg2rad(deg)))*16*5, 
+            "end_y": y-round(np.cos(np.deg2rad(deg)))*16*5, 
+        })
 
     def current(self, x, y, deg, val):
         # x = initial position in x
@@ -262,6 +291,12 @@ class schematicAscGenerator:
             "valueTag":valueTag,
             "window":window
         }
+        self.coords.append({
+            "start_x": x, 
+            "start_y": y, 
+            "end_x": x+round(np.sin(np.deg2rad(deg)))*16*5, 
+            "end_y": y-round(np.cos(np.deg2rad(deg)))*16*5, 
+        })
         
     def Component(self, x, y, deg, compName):
         x, y = self.coordsSetter(x, y)
@@ -290,8 +325,7 @@ class schematicAscGenerator:
             self.comp[name][include] = include
         except:
             return
-            
-        
+                
     def getWires(self):
         return self.wires
     def getR(self):
@@ -308,7 +342,8 @@ class schematicAscGenerator:
         return self.comp
     def getCoords(self):
         return self.coords
-    
+    def getComponents(self):
+        return ["ground", "res", "cap", "ind", "diode", "voltage", "current"]
     
     def compile(self, file_name = "output.asc"):
         self.asc = self.asc + '\n'.join([wire for wire in self.wires.values()]) + '\n'
