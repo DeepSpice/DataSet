@@ -1,20 +1,15 @@
-import lt2circuitikz.lt2ti as asc2tex
+#add remove for not .ASC files
+#remove .asc from .tex files
+import libraries.lt2circuitikz.lt2ti as asc2tex
 import os
 
-carpeta = "../data_generator/ascs"
-archivos = os.listdir(carpeta)
+pathASC = "../data_generator/ascs"
+pathTEX = "../data_generator/texs"
+filesASC = os.listdir(pathASC)
 
-#archivos_tex = []
-#archivos_tex = archivos_tex.append([x for x in archivos if x.endswith('.tex')])
-archivos_tex = [x for x in archivos if x.endswith('.asc')]
-print(archivos_tex)
+#filesASC = [x for x in files if x.endswith('.asc')]
 
-for k in archivos_tex:
+for k in filesASC:
     a2tobj = asc2tex.lt2circuiTikz()
-    ruta = "../data_generator/ascs/"+k
-    a2tobj.readASCFile(ruta)
-    a2tobj.writeCircuiTikz(k+r'.tex')
-
-'''a2tobj = asc2tex.lt2circuiTikz()
-a2tobj.readASCFile("..\data_generator\ascs\Prueba.asc")
-a2tobj.writeCircuiTikz("pruebaa"+'.tex')'''
+    a2tobj.readASCFile(pathASC + "/" + k)
+    a2tobj.writeCircuiTikz(pathTEX + "/" + k + r'.tex')
