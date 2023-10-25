@@ -2,6 +2,12 @@
 
 from pdf2image import convert_from_path
 
-pages = convert_from_path('pdf_file', 500)
-for count, page in enumerate(pages):
-    page.save(f'out{count}.jpg', 'JPEG')
+# Create a function that transform a masive amount of pdf files into jpg files
+
+def pdf2jpg(pdf_file):
+    pages = convert_from_path(pdf_file, 500)
+    for count, page in enumerate(pages):
+        page.save(f'out{count}.jpg', 'JPEG')
+    return print('Done')
+
+pdf2jpg('pdf_file')
