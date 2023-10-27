@@ -9,7 +9,7 @@ def create_asc(n=1, path=""):
     orientation = [0, 90]
 
     for i in range(n):
-        n_elements = random.randint(2, 5)
+        n_elements = random.randint(2, 10)
         n_nodes = [i for i in range(random.randint(2, n_elements))]        
         positions = []
         for element in range(n_elements):
@@ -17,7 +17,7 @@ def create_asc(n=1, path=""):
             node_f = random.choice(np.delete(n_nodes, node_i))
 
             component = random.choice(elements)
-            x_i, y_i = np.random.randint(10,50, size=2)*16
+            x_i, y_i = np.random.randint(10,100, size=2)*16
 
             if component == "ground":
                 generator.ground(x_i, y_i)
