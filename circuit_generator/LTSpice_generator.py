@@ -26,6 +26,8 @@ class schematicAscGenerator:
         self.v = {}
         self.comp = {}
         self.coords = []
+        self.asc = "Version 4\nSHEET 1 880 680\n"
+
         
     def coordsSetter(self, x, y, comp="wire", deg = 0):
         newX = x if x%16 == 0 else round(x/16)*16
@@ -365,8 +367,9 @@ class schematicAscGenerator:
         self.asc = self.asc + '\n'.join(['\n'.join([item for item in symbol.values()]) for symbol in self.v.values()]) + '\n'
         self.asc = self.asc + '\n'.join(['\n'.join([item for item in symbol.values()]) for symbol in self.comp.values()]) + '\n'
         self.asc = re.sub(r'\n+', '\n', self.asc)
-        file = open(file_name, "w")
-        a = file.write(self.asc)
-        file.close()
+        with open(file_name, "w") as f:
+            f.write(self.asc)
+            f.close()
+        self.reset()
         
     #def draw():
