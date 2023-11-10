@@ -1,6 +1,6 @@
 #add remove for not .ASC files
 #remove .asc from .tex files
-import libraries.lt2circuitikz.lt2ti as circuitikz
+import asc2png.libraries.lt2circuitikz.lt2ti as circuitikz
 import os
 
 #os.chdir('../Data')

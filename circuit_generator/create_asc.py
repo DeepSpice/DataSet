@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import sys
-from LTSpice_generator import schematicAscGenerator
+from circuit_generator.LTSpice_generator import schematicAscGenerator
 
 def create_asc(n=1, path=""):
     generator = schematicAscGenerator()
@@ -61,4 +61,4 @@ def create_asc(n=1, path=""):
                 generator.wire(item[0], item[1], items[0][0], items[0][1])
         generator.compile(path+"circuit_"+str(i)+".asc")
         
-sys.modules[__name__] = create_asc
+# sys.modules[__name__] = create_asc

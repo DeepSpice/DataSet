@@ -26,7 +26,7 @@ import shutil
 
 def tex2pdf(path, out_path):
     # Change the current working
-    os.chdir('../Data/temp/tex')
+    os.chdir('./Data/temp/tex')
 
     file = path.split("/")[-1]
     code = 'pdflatex ' + file
