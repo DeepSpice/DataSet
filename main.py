@@ -2,28 +2,26 @@ from asc2png.main_asc2png import convert
 from circuit_generator.main_generator import generate
 import time
 import sys
+from io import StringIO
 
-def show_spinner():
-    spinner = "|/-\\"
-    for _ in range(10):
-        for char in spinner:
-            sys.stdout.write(char)
-            sys.stdout.flush()
-            # time.sleep(0.1)
-            sys.stdout.write("\b")
+
 
 if __name__ == "__main__":
     number_of_circuits = int(input("Ingrese el número de circuitos a generar: "))
 
     start_time = time.time()
 
-    print("Generating images...")
-    show_spinner()
+    # Configura un StringIO para capturar la salida de writeCircuiTikz
+    output_buffer = StringIO()
+    # Sobrescribe el atributo stdout de sys
+    sys.stdout = output_buffer
 
     generate(number_of_circuits)
 
     convert()
 
+    # Restaura el stdout original
+    sys.stdout = sys.__stdout__
 
     end_time = time.time()
 

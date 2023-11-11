@@ -15,5 +15,3 @@ def create_folder(folder_path):
 def generate(number_of_circuits):
     create_folder(pathASC)
     create_asc(number_of_circuits, pathASC)
-
-
