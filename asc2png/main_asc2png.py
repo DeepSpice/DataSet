@@ -3,6 +3,7 @@ from asc2png.tex2pdf import tex2pdf
 from asc2png.pdf2png import pdf2png
 import shutil
 import os
+from tqdm import tqdm
 
 pathASC = "./Data/ascs/"
 pathTEMPtex = "./Data/temp/tex/"
@@ -36,7 +37,7 @@ def convert():
     filesASC = os.listdir(pathASC)
 
     #Convert each .asc file to .tex format
-    for k in filesASC:
+    for k in tqdm(filesASC):
         #Delete on the name the part that says ".asc"
         name = k.replace('.asc', '')
         asc2png(name)

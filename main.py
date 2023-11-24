@@ -10,13 +10,14 @@ if __name__ == "__main__":
     number_of_circuits = int(input("Ingrese el número de circuitos a generar: "))
 
     start_time = time.time()
-
+    print("-------------ASC---------------")
+    generate(number_of_circuits)
+    print("-------------TEX, PDF & PNG---------------")
     # Configura un StringIO para capturar la salida de writeCircuiTikz
     output_buffer = StringIO()
     # Sobrescribe el atributo stdout de sys
     sys.stdout = output_buffer
 
-    generate(number_of_circuits)
 
     convert()
 

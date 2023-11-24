@@ -1,14 +1,14 @@
 import numpy as np
 import random
 import sys
+from tqdm import tqdm
 from circuit_generator.LTSpice_generator import schematicAscGenerator
 
 def create_asc(n=1, path=""):
     generator = schematicAscGenerator()
     elements = generator.getComponents()
     orientation = [0, 90]
-
-    for i in range(n):
+    for i in tqdm(range(n)):
         n_elements = random.randint(2, 10)
         n_nodes = [i for i in range(random.randint(2, n_elements))]        
         positions = []
