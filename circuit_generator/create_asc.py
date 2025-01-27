@@ -6,6 +6,7 @@ from tqdm import tqdm
 from circuit_generator.LTSpice_generator import schematicAscGenerator
 from networkx import grid_graph, dijkstra_path
 
+
 def simplify_trajectory(trajectory):
     # Lista para almacenar los nodos simplificados
     simplified_nodes = []
@@ -32,6 +33,7 @@ def simplify_trajectory(trajectory):
 
 def create_asc(n=1, save_path=""):
     generator = schematicAscGenerator()
+    component_padding = generator.padding
     elements = generator.getComponents()
     orientation = [0, 90]
 
@@ -48,7 +50,7 @@ def create_asc(n=1, save_path=""):
             node_f = random.choice(np.delete(n_nodes, node_i))
 
             component = random.choice(elements)
-            x_i, y_i = np.random.randint(10,100, size=2)*16
+            x_i, y_i = np.random.randint(10,100, size=2)*component_padding
 
             if component == "ground":
                 generator.ground(x_i, y_i)
@@ -76,30 +78,48 @@ def create_asc(n=1, save_path=""):
 
         G = grid_graph(dim=(100, 100))
 
-        #G.remove_edge(node_i, node_f)
-
         coords = generator.getCoords()
         for node in n_nodes:
             items = []
             for init, end, element in init_end:
+                x_in = coords[element]["start_x"]
+                y_in = coords[element]["start_y"]
+                x_fin = coords[element]["end_x"]
+                y_fin = coords[element]["end_y"]
+
+                if(x_in == x_fin):
+                    nodes_in_component = np.linspace(int(y_in/component_padding), int(y_fin/component_padding), int(abs(y_in/component_padding - y_fin/component_padding))+1)
+                    for k, node_element in enumerate(nodes_in_component):
+                        if(len(nodes_in_component) == k+1):
+                            break
+                        if(((int(x_in/component_padding), int(node_element)), (int(x_fin/component_padding), int(nodes_in_component[k+1]))) in  G.edges):
+                            G.remove_edge((x_in/component_padding, node_element), (x_fin/component_padding, nodes_in_component[k+1])) 
+
+                if(y_in == y_fin):
+                    nodes_in_component = np.linspace(int(x_in/component_padding), int(x_fin/component_padding), int(abs(x_in/component_padding - x_fin/component_padding))+1)
+                    for k, node_element in enumerate(nodes_in_component):
+                        if(len(nodes_in_component) == k+1):
+                            break
+                        if(((int(y_in/component_padding), int(node_element)), (int(y_fin/component_padding), int(nodes_in_component[k+1]))) in  G.edges):
+                            G.remove_edge((int(y_in/component_padding), int(node_element)), (int(y_fin/component_padding), int(nodes_in_component[k+1]))) 
+
                 if init == node:
-                    x_in = coords[element]["start_x"]
-                    y_in = coords[element]["start_y"]
                     items.append([x_in, y_in])
                 if end == node:
-                    x_fin = coords[element]["end_x"]
-                    y_fin = coords[element]["end_y"]
                     items.append([x_fin, y_fin])
 
 
             for index, item in enumerate(items):
                 if index == 0:
                     continue
-                path = dijkstra_path(G, (item[0]/16, item[1]/16), (items[0][0]/16, items[0][1]/16))
+                try:
+                    path = dijkstra_path(G, (item[0]/component_padding, item[1]/component_padding), (items[0][0]/component_padding, items[0][1]/component_padding))
+                except:
+                    path = [(0, 0),(0, 1)]
                 simply_path = simplify_trajectory(path)
                 
                 for node_index, path_nodes in enumerate(simply_path):
-                    generator.wire(path_nodes[0]*16, path_nodes[1]*16, simply_path[node_index+1][0]*16, simply_path[node_index+1][1]*16)
+                    generator.wire(path_nodes[0]*component_padding, path_nodes[1]*component_padding, simply_path[node_index+1][0]*component_padding, simply_path[node_index+1][1]*component_padding)
                     if(node_index+1 >= len(simply_path)-1):
                         break
 

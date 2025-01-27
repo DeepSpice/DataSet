@@ -13,6 +13,8 @@ class schematicAscGenerator:
         self.comp = {}
         self.coords = []
 
+        self.padding = 16
+
         # File header
         self.asc = "Version 4\nSHEET 1 880 680\n"
     
@@ -30,22 +32,22 @@ class schematicAscGenerator:
 
         
     def coordsSetter(self, x, y, comp="wire", deg = 0):
-        newX = x if x%16 == 0 else round(x/16)*16
-        newY = y if y%16 == 0 else round(y/16)*16
+        newX = x if x%self.padding == 0 else round(x/self.padding)*self.padding
+        newY = y if y%self.padding == 0 else round(y/self.padding)*self.padding
         #newY = -1*newY
 
         if comp == "res" or comp == "ind":
-            newX = newX-16*np.sign(np.cos(np.deg2rad(deg+1)))
-            newY = newY-16*np.sign(np.sin(np.deg2rad(deg+1)))
+            newX = newX-self.padding*np.sign(np.cos(np.deg2rad(deg+1)))
+            newY = newY-self.padding*np.sign(np.sin(np.deg2rad(deg+1)))
         if comp == "diode":
-            newX = newX-16*round(np.cos(np.deg2rad(deg)))
-            newY = newY-16*round(np.sin(np.deg2rad(deg)))
+            newX = newX-self.padding*round(np.cos(np.deg2rad(deg)))
+            newY = newY-self.padding*round(np.sin(np.deg2rad(deg)))
         if comp == "cap":
-            newX = newX-16*round(np.cos(np.deg2rad(deg)))
-            newY = newY-16*round(np.sin(np.deg2rad(deg)))
+            newX = newX-self.padding*round(np.cos(np.deg2rad(deg)))
+            newY = newY-self.padding*round(np.sin(np.deg2rad(deg)))
         if comp == "volt":
-            newX = newX+16*round(np.sin(np.deg2rad(deg)))
-            newY = newY-16*round(np.cos(np.deg2rad(deg)))
+            newX = newX+self.padding*round(np.sin(np.deg2rad(deg)))
+            newY = newY-self.padding*round(np.cos(np.deg2rad(deg)))
         if comp == "curr":
             newX = newX
             newY = newY
@@ -111,8 +113,8 @@ class schematicAscGenerator:
         self.coords.append({
             "start_x": x, 
             "start_y": y, 
-            "end_x": x-round(np.sin(np.deg2rad(deg)))*16*5, 
-            "end_y": y+round(np.cos(np.deg2rad(deg)))*16*5, 
+            "end_x": x-round(np.sin(np.deg2rad(deg)))*self.padding*5, 
+            "end_y": y+round(np.cos(np.deg2rad(deg)))*self.padding*5, 
         })
 
         # Change window size depends of rotation
@@ -155,8 +157,8 @@ class schematicAscGenerator:
         self.coords.append({
             "start_x": x, 
             "start_y": y, 
-            "end_x": x-round(np.sin(np.deg2rad(deg)))*16*4, 
-            "end_y": y+round(np.cos(np.deg2rad(deg)))*16*4, 
+            "end_x": x-round(np.sin(np.deg2rad(deg)))*self.padding*4, 
+            "end_y": y+round(np.cos(np.deg2rad(deg)))*self.padding*4, 
         })
             
     def ind(self, x, y, deg, val):
@@ -193,8 +195,8 @@ class schematicAscGenerator:
         self.coords.append({
             "start_x": x, 
             "start_y": y, 
-            "end_x": x-round(np.sin(np.deg2rad(deg)))*16*5, 
-            "end_y": y+round(np.cos(np.deg2rad(deg)))*16*5, 
+            "end_x": x-round(np.sin(np.deg2rad(deg)))*self.padding*5, 
+            "end_y": y+round(np.cos(np.deg2rad(deg)))*self.padding*5, 
         })
                        
     def diode(self, x, y, deg):
@@ -228,8 +230,8 @@ class schematicAscGenerator:
         self.coords.append({
             "start_x": x, 
             "start_y": y, 
-            "end_x": x-round(np.sin(np.deg2rad(deg)))*16*4, 
-            "end_y": y+round(np.cos(np.deg2rad(deg)))*16*4, 
+            "end_x": x-round(np.sin(np.deg2rad(deg)))*self.padding*4, 
+            "end_y": y+round(np.cos(np.deg2rad(deg)))*self.padding*4, 
         })
                      
     def voltage(self, x, y, deg, val):
@@ -268,8 +270,8 @@ class schematicAscGenerator:
         self.coords.append({
             "start_x": x, 
             "start_y": y, 
-            "end_x": x-round(np.sin(np.deg2rad(deg)))*16*5, 
-            "end_y": y+round(np.cos(np.deg2rad(deg)))*16*5, 
+            "end_x": x-round(np.sin(np.deg2rad(deg)))*self.padding*5, 
+            "end_y": y+round(np.cos(np.deg2rad(deg)))*self.padding*5, 
         })
 
     def current(self, x, y, deg, val):
@@ -306,8 +308,8 @@ class schematicAscGenerator:
         self.coords.append({
             "start_x": x, 
             "start_y": y, 
-            "end_x": x-round(np.sin(np.deg2rad(deg)))*16*5, 
-            "end_y": y+round(np.cos(np.deg2rad(deg)))*16*5, 
+            "end_x": x-round(np.sin(np.deg2rad(deg)))*self.padding*5, 
+            "end_y": y+round(np.cos(np.deg2rad(deg)))*self.padding*5, 
         })
         
     def Component(self, x, y, deg, compName):
