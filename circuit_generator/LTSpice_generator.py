@@ -55,6 +55,27 @@ class schematicAscGenerator:
             newX = newX
             newY = newY
         return round(newX), round(newY)
+
+
+    def create components(self,comp_type, x, y, deg, val= None, extra_config=None)
+        #para crear una sola función general para todos los componentes
+        #ahora hay que un nombre unico basado en cada uno de los componentes 
+
+        component_info = {
+            'res' : (F'R{len(self.r)}', self.r, "SYMBOL res", val), #Resistence
+            'cap' : (F'C{len(self.c)', self.c, "SYMBOL cap", val), #Capacitor
+            'ind' : (F'L{len(self.l)', self.l, "SYMBOL ind", val), #Inductor 
+            'diode': (F'D{len(self.d)', self.d, "SYMBOL diode", val), #Diode
+            'volt': (F'V{len(self.v)', self.v, "SYMBOL volt", val), #Voltage
+            'current': (F'C{len(self.c)', self.c, "SYMBOL current", val), #Current
+        }
+        if comp_type not in component_info:
+            return
+        
+                        
+            
+
+              
     
     def wire(self, x0, y0, x1, y1):
         #'''
