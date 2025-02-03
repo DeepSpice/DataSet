@@ -2,8 +2,8 @@ import numpy as np
 import random
 import sys
 from tqdm import tqdm
-#from LTSpice_generator import schematicAscGenerator
-from circuit_generator.LTSpice_generator import schematicAscGenerator
+#from LTSpice_generator import SchematicAscGenerator
+from circuit_generator.LTSpice_generator import SchematicAscGenerator
 from networkx import grid_graph, dijkstra_path
 
 
@@ -32,7 +32,7 @@ def simplify_trajectory(trajectory):
     return simplified_nodes
 
 def create_asc(n=1, save_path=""):
-    generator = schematicAscGenerator()
+    generator = SchematicAscGenerator()
     component_padding = generator.padding
     elements = generator.getComponents()
     orientation = [0, 90]
@@ -51,21 +51,22 @@ def create_asc(n=1, save_path=""):
 
             component = random.choice(elements)
             x_i, y_i = np.random.randint(10,100, size=2)*component_padding
+            generator.create_component(component, x_i, y_i, random.choice(orientation), random.randint(1,5))
 
-            if component == "ground":
-                generator.ground(x_i, y_i)
-            elif component == "res":
-                generator.res(x_i, y_i, random.choice(orientation), random.randint(1,5))
-            elif component == "cap":
-                generator.cap(x_i, y_i, random.choice(orientation), random.randint(1,5))
-            elif component == "ind":
-                generator.ind(x_i, y_i, random.choice(orientation), random.randint(1,5))
-            elif component == "diode":
-                generator.diode(x_i, y_i, random.choice(orientation))
-            elif component == "voltage":
-                generator.voltage(x_i, y_i, random.choice(orientation), random.randint(1,5))
-            elif component == "current":
-                generator.current(x_i, y_i, random.choice(orientation), random.randint(1,5))
+            # if component == "ground":
+            #     generator.ground(x_i, y_i)
+            # elif component == "res":
+            #     generator.res(x_i, y_i, random.choice(orientation), random.randint(1,5))
+            # elif component == "cap":
+            #     generator.cap(x_i, y_i, random.choice(orientation), random.randint(1,5))
+            # elif component == "ind":
+            #     generator.ind(x_i, y_i, random.choice(orientation), random.randint(1,5))
+            # elif component == "diode":
+            #     generator.diode(x_i, y_i, random.choice(orientation))
+            # elif component == "voltage":
+            #     generator.voltage(x_i, y_i, random.choice(orientation), random.randint(1,5))
+            # elif component == "current":
+            #     generator.current(x_i, y_i, random.choice(orientation), random.randint(1,5))
 
             positions.append({
                 "node_i": node_i,
@@ -79,6 +80,7 @@ def create_asc(n=1, save_path=""):
         G = grid_graph(dim=(100, 100))
 
         coords = generator.getCoords()
+
         for node in n_nodes:
             items = []
             for init, end, element in init_end:

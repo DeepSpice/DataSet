@@ -1,3 +1,3 @@
-from .LTSpice_generator import schematicAscGenerator
+from .LTSpice_generator import SchematicAscGenerator
 
-__all__ = ["schematicAscGenerator"]
+__all__ = ["SchematicAscGenerator"]
