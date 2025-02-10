@@ -121,7 +121,7 @@ def create_asc(n=1, save_path=""):
                 simply_path = simplify_trajectory(path)
                 
                 for node_index, path_nodes in enumerate(simply_path):
-                    generator.wire(path_nodes[0]*component_padding, path_nodes[1]*component_padding, simply_path[node_index+1][0]*component_padding, simply_path[node_index+1][1]*component_padding)
+                    generator.wire((path_nodes[0]+1)*component_padding, (path_nodes[1]+1)*component_padding, (simply_path[node_index+1][0]+1)*component_padding, (simply_path[node_index+1][1]+1)*component_padding)
                     if(node_index+1 >= len(simply_path)-1):
                         break
 

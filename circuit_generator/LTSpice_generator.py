@@ -49,8 +49,8 @@ class SchematicAscGenerator:
 
         if comp in adjustments_init and comp in adjustments_end:
             adj_x0, adj_y0 = adjustments_init[comp]
-            new_x0 += self.padding * adj_x0
-            new_y0 += self.padding * adj_y0
+            new_x0 = new_x0 #self.padding * adj_x0 +8
+            new_y0 = new_y0 #self.padding * adj_y0 -8
 
             adj_x1, adj_y1 = adjustments_end[comp]
             new_x1 = new_x0 + adj_x1
@@ -64,7 +64,7 @@ class SchematicAscGenerator:
             'cap': (f'C{len(self.components["cap"])}', self.components['cap'], "SYMBOL cap", val, "capacitance"),
             'ind': (f'L{len(self.components["ind"])}', self.components['ind'], "SYMBOL ind", val, "inductance"),
             'diode': (f'D{len(self.components["diode"])}', self.components['diode'], "SYMBOL diode", val, None),
-            'volt': (f'V{len(self.components["volt"])}', self.components['volt'], "SYMBOL volt", val, "voltage"),
+            'volt': (f'V{len(self.components["volt"])}', self.components['volt'], "SYMBOL voltage", val, "voltage"),
             'current': (f'V{len(self.components["volt"])}', self.components['volt'], "SYMBOL current", val, "current"),
             'comp': (f'I{len(self.components["comp"])}', self.components['comp'], "SYMBOL current", val, "current")
         }
@@ -91,8 +91,8 @@ class SchematicAscGenerator:
         }
 
         self.coords.append({
-            "start_x": x1, 
-            "start_y": y1, 
+            "start_x": x, 
+            "start_y": y, 
             "end_x": x_end,
             "end_y": y_end
         })
