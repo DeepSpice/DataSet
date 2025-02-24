@@ -42,15 +42,15 @@ class SchematicAscGenerator:
             "ind": (-round(np.sin(np.deg2rad(deg)))*self.padding*5, round(np.cos(np.deg2rad(deg)))*self.padding*5), #
             "diode": (-round(np.sin(np.deg2rad(deg)))*self.padding*4, -round(np.cos(np.deg2rad(deg)))*self.padding*4), #
             "cap": (-round(np.sin(np.deg2rad(deg)))*self.padding*4, round(np.cos(np.deg2rad(deg)))*self.padding*4), #
-            "volt": (-round(np.sin(np.deg2rad(deg)))*self.padding*5, round(np.cos(np.deg2rad(deg)))*self.padding*5),
-            "current": (-round(np.sin(np.deg2rad(deg)))*self.padding*4, round(np.cos(np.deg2rad(deg)))*self.padding*5),
+            "volt": (-round(np.sin(np.deg2rad(deg)))*self.padding*6, round(np.cos(np.deg2rad(deg)))*self.padding*6),
+            "current": (-round(np.sin(np.deg2rad(deg)))*self.padding*6, round(np.cos(np.deg2rad(deg)))*self.padding*6),
             "wire": (0, 0)
         }
 
         if comp in adjustments_init and comp in adjustments_end:
             adj_x0, adj_y0 = adjustments_init[comp]
-            new_x0 = new_x0 #self.padding * adj_x0 +8
-            new_y0 = new_y0 #self.padding * adj_y0 -8
+            new_x0 = new_x0 + self.padding * adj_x0 
+            new_y0 = new_y0 + self.padding * adj_y0 
 
             adj_x1, adj_y1 = adjustments_end[comp]
             new_x1 = new_x0 + adj_x1
@@ -112,8 +112,8 @@ class SchematicAscGenerator:
         })
 
     def wire(self, x0, y0, x1, y1):
-        x0, y0, _, _ = self.coords_setter(x0, y0)
-        x1, y1, _, _ = self.coords_setter(x1, y1)
+        # x0, y0, _, _ = self.coords_setter(x0, y0)
+        # x1, y1, _, _ = self.coords_setter(x1, y1)
 
         name = f'W{len(self.components["wires"])}'
         if x0 == x1 or y0 == y1:
