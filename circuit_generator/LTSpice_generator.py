@@ -13,6 +13,26 @@ class SchematicAscGenerator:
             'volt': {},
             'comp': {}
         }
+
+        self.rotation = {
+            # deg: [sign x, sign y, length x, length y]
+            0: [1, 1, 0, 1],
+            90: [-1, 1, 1, 0],
+            180: [-1, -1, 0, -1],
+            270: [1, -1, -1, 0],
+        }
+        self.components_offsets = {
+            # "comp": [x, y, length]
+            'wire': [0,0,0],
+            'ground': [0,0,0],
+            'res': [16,16,96-16],
+            'cap': [16,0,64],
+            'ind': [16,16,96-16],
+            'diode': [16,0,64],
+            'volt': [0,16,112-16],
+            'comp': [0,0,0]
+
+        }
         self.coords = []
         self.padding = 16
         # File header
@@ -25,36 +45,15 @@ class SchematicAscGenerator:
         self.asc = "Version 4\nSHEET 1 880 680\n"
 
     def coords_setter(self, x0, y0, comp="wire", deg=0):
-        new_x0 = round(x0 / self.padding) * self.padding if x0 % self.padding != 0 else x0
-        new_y0 = round(y0 / self.padding) * self.padding if y0 % self.padding != 0 else y0
+        initial_x0 = round(x0 / self.padding) * self.padding if x0 % self.padding != 0 else x0
+        initial_y0 = round(y0 / self.padding) * self.padding if y0 % self.padding != 0 else y0
 
-        adjustments_init = {
-            "res": (-np.sign(np.cos(np.deg2rad(deg + 1))), -np.sign(np.sin(np.deg2rad(deg + 1)))),
-            "ind": (-np.sign(np.cos(np.deg2rad(deg + 1))), -np.sign(np.sin(np.deg2rad(deg + 1)))),
-            "diode": (-round(np.cos(np.deg2rad(deg))), -round(np.sin(np.deg2rad(deg)))),
-            "cap": (-round(np.cos(np.deg2rad(deg))), -round(np.sin(np.deg2rad(deg)))),
-            "volt": (round(np.sin(np.deg2rad(deg))), -round(np.cos(np.deg2rad(deg)))),
-            "current": (round(np.sin(np.deg2rad(deg))), -round(np.cos(np.deg2rad(deg)))),
-            "wire": (0, 0)
-        }
-        adjustments_end = {
-            "res": (-round(np.sin(np.deg2rad(deg)))*self.padding*5, round(np.cos(np.deg2rad(deg)))*self.padding*5), #
-            "ind": (-round(np.sin(np.deg2rad(deg)))*self.padding*5, round(np.cos(np.deg2rad(deg)))*self.padding*5), #
-            "diode": (-round(np.sin(np.deg2rad(deg)))*self.padding*4, -round(np.cos(np.deg2rad(deg)))*self.padding*4), #
-            "cap": (-round(np.sin(np.deg2rad(deg)))*self.padding*4, round(np.cos(np.deg2rad(deg)))*self.padding*4), #
-            "volt": (-round(np.sin(np.deg2rad(deg)))*self.padding*6, round(np.cos(np.deg2rad(deg)))*self.padding*6),
-            "current": (-round(np.sin(np.deg2rad(deg)))*self.padding*6, round(np.cos(np.deg2rad(deg)))*self.padding*6),
-            "wire": (0, 0)
-        }
+        # Coords for wiring
+        new_x0 = initial_x0 + self.components_offsets[comp][0]*self.rotation[deg][0]
+        new_y0 = initial_y0 + self.components_offsets[comp][1]*self.rotation[deg][1]
 
-        if comp in adjustments_init and comp in adjustments_end:
-            adj_x0, adj_y0 = adjustments_init[comp]
-            new_x0 = new_x0 + self.padding * adj_x0 
-            new_y0 = new_y0 + self.padding * adj_y0 
-
-            adj_x1, adj_y1 = adjustments_end[comp]
-            new_x1 = new_x0 + adj_x1
-            new_y1 = new_y0 + adj_y1
+        new_x1 = new_x0 + self.components_offsets[comp][2]*self.rotation[deg][2]
+        new_y1 = new_y0 + self.components_offsets[comp][2]*self.rotation[deg][3]
 
         return round(new_x0), round(new_y0), round(new_x1), round(new_y1)
 

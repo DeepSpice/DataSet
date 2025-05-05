@@ -2,8 +2,8 @@ import numpy as np
 import random
 import sys
 from tqdm import tqdm
-#from LTSpice_generator import SchematicAscGenerator
-from circuit_generator.LTSpice_generator import SchematicAscGenerator
+from LTSpice_generator import SchematicAscGenerator
+#from circuit_generator.LTSpice_generator import SchematicAscGenerator
 from networkx import grid_graph, dijkstra_path
 
 
@@ -69,13 +69,14 @@ def create_asc(n=1, save_path=""):
 
 
         print("----components-----")
-        print(init_end)
+        print(positions)
+        #print(init_end)
         
 
         G = grid_graph(dim=(100, 100))
 
         coords = generator.getCoords()
-        # print(coords)
+        print(coords)
 
         for node in n_nodes:
             items = []

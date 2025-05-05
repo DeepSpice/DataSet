@@ -6,7 +6,7 @@ Grid: 16
 
 ![alt text](images/resistanceModel.png)
 
-Length: 96
+Length: 96 (16*6)
 
 Offsets for wiring:
 
@@ -32,7 +32,7 @@ Offsets for wiring:
 
 ![alt text](images/capacitorModel.png)
 
-Length: 64
+Length: 64 (16*4)
 
 Offsets for wiring:
 
@@ -51,7 +51,7 @@ Offsets for wiring:
 ## Inductance
 ![alt text](images/inductanceModel.png)
 
-Length: 112
+Length: 96 (16*6)
 
 Offsets for wiring:
 
@@ -74,7 +74,7 @@ Offsets for wiring:
 ## Diode
 ![alt text](images/diodeModel.png)
 
-Length: 64
+Length: 64 (16*4)
 
 Offsets for wiring:
 
@@ -93,7 +93,7 @@ Offsets for wiring:
 ## Sources  
 ![alt text](images/sourceModel.png)
 
-Length: 112
+Length: 112 (16*7)
 
 Offsets for wiring:
 
