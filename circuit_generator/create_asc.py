@@ -2,8 +2,8 @@ import numpy as np
 import random
 import sys
 from tqdm import tqdm
-from LTSpice_generator import SchematicAscGenerator
-#from circuit_generator.LTSpice_generator import SchematicAscGenerator
+#from LTSpice_generator import SchematicAscGenerator
+from circuit_generator.LTSpice_generator import SchematicAscGenerator
 from networkx import grid_graph, dijkstra_path
 
 
@@ -35,6 +35,7 @@ def create_asc(n=1, save_path=""):
     generator = SchematicAscGenerator()
     component_padding = generator.padding
     elements = generator.getComponents()
+    elements = elements[:3]
     orientation = [0, 90]
 
 
@@ -68,6 +69,7 @@ def create_asc(n=1, save_path=""):
         init_end = [ [i["node_i"], i["node_f"], i["element"]] for i in positions]
 
 
+
         print("----components-----")
         print(positions)
         #print(init_end)
@@ -78,54 +80,96 @@ def create_asc(n=1, save_path=""):
         coords = generator.getCoords()
         print(coords)
 
+        coords_wires = []
+
         for node in n_nodes:
-            items = []
-            for init, end, element in init_end:
-                x_in = int(coords[element]["start_x"])
-                y_in = int(coords[element]["start_y"])
-                x_fin = int(coords[element]["end_x"])
-                y_fin = int(coords[element]["end_y"])
+            temp_coords = []
+            for pos in positions:
+                print(pos)
+                if pos["node_i"] == node:
+                    temp_coords.append([int(coords[pos["element"]]["start_x"]), int(coords[pos["element"]]["start_y"])])
+                if pos["node_f"] == node:
+                    temp_coords.append([int(coords[pos["element"]]["end_x"]), int(coords[pos["element"]]["end_y"])])
+                print(temp_coords)
+            coords_wires.append(temp_coords)
 
-                if(x_in == x_fin):
-                    nodes_in_component = np.linspace(int(y_in/component_padding), int(y_fin/component_padding), int(abs(y_in/component_padding - y_fin/component_padding))+1)
-                    for k, node_element in enumerate(nodes_in_component):
-                        if(len(nodes_in_component) == k+1):
-                            break
-                        if(((int(x_in/component_padding), int(node_element)), (int(x_fin/component_padding), int(nodes_in_component[k+1]))) in  G.edges):
-                            G.remove_edge((x_in/component_padding, node_element), (x_fin/component_padding, nodes_in_component[k+1])) 
 
-                if(y_in == y_fin):
-                    nodes_in_component = np.linspace(int(x_in/component_padding), int(x_fin/component_padding), int(abs(x_in/component_padding - x_fin/component_padding))+1)
-                    for k, node_element in enumerate(nodes_in_component):
-                        if(len(nodes_in_component) == k+1):
-                            break
-                        if(((int(y_in/component_padding), int(node_element)), (int(y_fin/component_padding), int(nodes_in_component[k+1]))) in  G.edges):
-                            G.remove_edge((int(y_in/component_padding), int(node_element)), (int(y_fin/component_padding), int(nodes_in_component[k+1]))) 
 
-                if init == node:
-                    items.append([x_in, y_in])
-                if end == node:
-                    items.append([x_fin, y_fin])
 
-            # print(items)
-            for index, item in enumerate(items):
-                if index == 0:
-                    continue
+        for coords_pairs in coords_wires:
+            for i in range(len(coords_pairs)):
+                print(coords_pairs[i])
+                if i+1<len(coords_pairs):
+                    generator.wire(coords_pairs[i][0], 
+                    coords_pairs[i][1],
+                    coords_pairs[i+1][0],
+                    coords_pairs[i+1][1])
+
+        
+
+            
+
+
+
+
+
+            # items = []
+            # for init, end, element in init_end:
+            #     x_in = int(coords[element]["start_x"])
+            #     y_in = int(coords[element]["start_y"])
+            #     x_fin = int(coords[element]["end_x"])
+            #     y_fin = int(coords[element]["end_y"])
+
+            #     # print(x_in,
+            #     #     y_in,
+            #     #     x_fin,
+            #     #     y_fin)
+
+            #     generator.wire(x_in, 
+            #     y_in,
+            #     x_fin,
+            #     y_fin)
+
+            #     if(x_in == x_fin):
+            #         nodes_in_component = np.linspace(int(y_in/component_padding), int(y_fin/component_padding), int(abs(y_in/component_padding - y_fin/component_padding))+1)
+            #         for k, node_element in enumerate(nodes_in_component):
+            #             if(len(nodes_in_component) == k+1):
+            #                 break
+            #             if(((int(x_in/component_padding), int(node_element)), (int(x_fin/component_padding), int(nodes_in_component[k+1]))) in  G.edges):
+            #                 G.remove_edge((x_in/component_padding, node_element), (x_fin/component_padding, nodes_in_component[k+1])) 
+
+            #     if(y_in == y_fin):
+            #         nodes_in_component = np.linspace(int(x_in/component_padding), int(x_fin/component_padding), int(abs(x_in/component_padding - x_fin/component_padding))+1)
+            #         for k, node_element in enumerate(nodes_in_component):
+            #             if(len(nodes_in_component) == k+1):
+            #                 break
+            #             if(((int(y_in/component_padding), int(node_element)), (int(y_fin/component_padding), int(nodes_in_component[k+1]))) in  G.edges):
+            #                 G.remove_edge((int(y_in/component_padding), int(node_element)), (int(y_fin/component_padding), int(nodes_in_component[k+1]))) 
+
+            #     if init == node:
+            #         items.append([x_in, y_in])
+            #     if end == node:
+            #         items.append([x_fin, y_fin])
+
+            # # print(items)
+            # for index, item in enumerate(items):
+            #     if index == 0:
+            #         continue
                 
-                path = dijkstra_path(G, (item[0]/component_padding, item[1]/component_padding), (items[0][0]/component_padding, items[0][1]/component_padding))
+            #     path = dijkstra_path(G, (item[0]/component_padding, item[1]/component_padding), (items[0][0]/component_padding, items[0][1]/component_padding))
 
-                simply_path = simplify_trajectory(path)
+            #     simply_path = simplify_trajectory(path)
                 
-                for node_index, path_nodes in enumerate(simply_path):
-                    # print("----Coords for generating wires-----")
-                    # print((path_nodes[0]+1)*component_padding, (path_nodes[1]+1)*component_padding, (simply_path[node_index+1][0]+1)*component_padding, (simply_path[node_index+1][1]+1)*component_padding)
-                    generator.wire(
-                        int((path_nodes[0])*component_padding), 
-                        int((path_nodes[1])*component_padding), 
-                        int((simply_path[node_index+1][0])*component_padding), 
-                        int((simply_path[node_index+1][1])*component_padding))
-                    if(node_index+1 >= len(simply_path)-1):
-                        break
+            #     for node_index, path_nodes in enumerate(simply_path):
+            #         # print("----Coords for generating wires-----")
+            #         # print((path_nodes[0]+1)*component_padding, (path_nodes[1]+1)*component_padding, (simply_path[node_index+1][0]+1)*component_padding, (simply_path[node_index+1][1]+1)*component_padding)
+            #         generator.wire(
+            #             int((path_nodes[0])*component_padding), 
+            #             int((path_nodes[1])*component_padding), 
+            #             int((simply_path[node_index+1][0])*component_padding), 
+            #             int((simply_path[node_index+1][1])*component_padding))
+            #         if(node_index+1 >= len(simply_path)-1):
+            #             break
 
         generator.compile(save_path+"circuit_"+str(i)+".asc")
         

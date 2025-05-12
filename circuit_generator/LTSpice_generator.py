@@ -11,6 +11,7 @@ class SchematicAscGenerator:
             'ind': {},
             'diode': {},
             'volt': {},
+            'current': {},
             'comp': {}
         }
 
@@ -22,21 +23,35 @@ class SchematicAscGenerator:
             270: [1, -1, -1, 0],
         }
         self.components_offsets = {
-            # "comp": [x, y, length]
-            'wire': [0,0,0],
-            'ground': [0,0,0],
-            'res': [16,16,96-16],
-            'cap': [16,0,64],
-            'ind': [16,16,96-16],
-            'diode': [16,0,64],
-            'volt': [0,16,112-16],
-            'comp': [0,0,0]
+            # "comp": [x, y, length, phase]
+            'wire': [0,0,0,0],
+            'ground': [0,0,0,0],
+            'res': [16,16,96-16,0],
+            'cap': [16,0,64,0],
+            'ind': [16,16,96-16,0],
+            'diode': [16,0,64,90],
+            'volt': [0,16,112-16,90],
+            'current': [0,0,80,90],
+            'comp': [0,0,80,0]
 
         }
         self.coords = []
         self.padding = 16
         # File header
         self.asc = "Version 4\nSHEET 1 880 680\n"
+
+    def rotation_matrix(self, deg, init_coords):
+
+        r_matrix = np.asarray([[np.cos(deg*np.pi/180), -np.sin(deg*np.pi/180)],
+                               [np.sin(deg*np.pi/180), np.cos(deg*np.pi/180)]])
+        
+        init_coords = np.asarray(init_coords)
+
+        rotated_coords =  np.dot(r_matrix, init_coords)
+
+
+        return rotated_coords.astype("int32")
+
 
     def reset(self):
         for key in self.components:
@@ -48,9 +63,11 @@ class SchematicAscGenerator:
         initial_x0 = round(x0 / self.padding) * self.padding if x0 % self.padding != 0 else x0
         initial_y0 = round(y0 / self.padding) * self.padding if y0 % self.padding != 0 else y0
 
+        component_off = self.rotation_matrix(deg+self.components_offsets[comp][3], self.components_offsets[comp][:2])
+
         # Coords for wiring
-        new_x0 = initial_x0 + self.components_offsets[comp][0]*self.rotation[deg][0]
-        new_y0 = initial_y0 + self.components_offsets[comp][1]*self.rotation[deg][1]
+        new_x0 = initial_x0 + component_off[0]
+        new_y0 = initial_y0 + component_off[1]
 
         new_x1 = new_x0 + self.components_offsets[comp][2]*self.rotation[deg][2]
         new_y1 = new_y0 + self.components_offsets[comp][2]*self.rotation[deg][3]
@@ -64,8 +81,8 @@ class SchematicAscGenerator:
             'ind': (f'L{len(self.components["ind"])}', self.components['ind'], "SYMBOL ind", val, "inductance"),
             'diode': (f'D{len(self.components["diode"])}', self.components['diode'], "SYMBOL diode", val, None),
             'volt': (f'V{len(self.components["volt"])}', self.components['volt'], "SYMBOL voltage", val, "voltage"),
-            'current': (f'V{len(self.components["volt"])}', self.components['volt'], "SYMBOL current", val, "current"),
-            'comp': (f'I{len(self.components["comp"])}', self.components['comp'], "SYMBOL current", val, "current")
+            'current': (f'V{len(self.components["current"])}', self.components['current'], "SYMBOL current", val, "current"),
+            'comp': (f'I{len(self.components["current"])}', self.components['current'], "SYMBOL current", val, "current")
         }
 
         if comp_type == "current":
@@ -78,8 +95,8 @@ class SchematicAscGenerator:
             return
 
         name, comp_dict, symbol, value, value_tag = component_info[comp_type]
-        x1, y1, x_end, y_end = self.coords_setter(x, y, comp_type, deg)
-        header = f'{symbol} {x1} {y1} R{deg}'
+        x_start, y_start, x_end, y_end = self.coords_setter(x, y, comp_type, deg)
+        header = f'{symbol} {x} {y} R{deg}'
         name_tag = f'SYMATTR InstName {name}'
         value_tag = f'SYMATTR Value {value}'
 
@@ -90,8 +107,8 @@ class SchematicAscGenerator:
         }
 
         self.coords.append({
-            "start_x": x, 
-            "start_y": y, 
+            "start_x": x_start, 
+            "start_y": y_start, 
             "end_x": x_end,
             "end_y": y_end
         })
@@ -119,35 +136,6 @@ class SchematicAscGenerator:
             self.components["wires"][name] = f'WIRE {x0:-} {y0:-} {x1:-} {y1:-}'
         else:
             self.components["wires"][name] = f'WIRE {x0:-} {y0:-} {x1:-} {y0:-}\nWIRE {x1:-} {y0:-} {x1:-} {y1:-}'
-
-    def current(self, x, y, deg, val):
-        x1, y1 = self.coords_setter(x, y)
-        name = f'I{len(self.v)}'
-        header = f'SYMBOL current {x1} {y1} R{deg}'
-        name_tag = f'SYMATTR InstName {name}'
-        value_tag = f'SYMATTR Value {val}'
-
-        window = ""
-        if deg == 90:
-            window = "WINDOW 0 -32 40 VBottom 2\nWINDOW 3 32 40 VTop 2"
-        elif deg == 180:
-            window = "WINDOW 0 24 80 VLeft 2\nWINDOW 3 24 0 VLeft 2"
-        elif deg == 270:
-            window = "WINDOW 0 32 40 VTop 2\nWINDOW 3 -32 40 VBottom 2"
-            
-        # Object with info of capacitor
-        self.components["volt"][name] = {
-            "header": header,
-            "nameTag": name_tag,
-            "valueTag": value_tag,
-            "window": window
-        }
-        self.coords.append({
-            "start_x": x,
-            "start_y": y,
-            "end_x": x - round(np.sin(np.deg2rad(deg))) * self.padding * 5,
-            "end_y": y + round(np.cos(np.deg2rad(deg))) * self.padding * 5,
-        })
 
     def component(self, x, y, deg, comp_name):
         x1, y1 = self.coordsSetter(x, y)
